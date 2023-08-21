@@ -8,18 +8,17 @@
 // const os = require("os");
 // console.log(os.uptime());
 
-// const http = require("http");
+const { createReadStream } = require("fs");
 
-// const server = http.createServer((req, res) => {
-//     if (req.url === "/") {
-//         res.end("Welcome to the family");
-//         return;
-//     }
-//     if (req.url === "/about") {
-//         res.end("This is aobut page");
-//         return;
-//     }
-//     res.end(`<h1>Oops! Page doesn't exist</h1> <a href="/">Back home</a>`);
-// });
+const stream = createReadStream("./content/big.txt", {
+    highWaterMark: 9000,
+    // encoding: "utf-8",
+});
 
-// server.listen(5000);
+stream.on("data", (result) => {
+    console.log(result);
+});
+
+stream.on("error", (err) => {
+    console.log(err);
+});
