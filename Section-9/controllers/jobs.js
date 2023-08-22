@@ -7,7 +7,7 @@ const getJob = async (req, res) => {
 };
 
 const createJob = async (req, res) => {
-    res.status(200).json({ msg: "Job created" });
+    res.status(200).json(req.user);
 };
 
 const updateJob = async (req, res) => {
