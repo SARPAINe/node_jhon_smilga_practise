@@ -1,21 +1,68 @@
+const { StatusCodes } = require("http-status-codes");
+const Job = require("../models/Job");
+const { NotFoundError, BadRequestError } = require("../errors");
+
 const getAllJobs = async (req, res) => {
-    res.status(200).json({ msg: "All jobs" });
+  const jobs = await Job.find({ createdBy: req.user.userId }).sort("createdAt");
+  res.status(StatusCodes.OK).json({ jobs: jobs, count: jobs.length });
 };
 
 const getJob = async (req, res) => {
-    res.status(200).json({ msg: "Single Job" });
+  const {
+    user: { userId },
+    params: { id: jobId },
+  } = req;
+  const job = await Job.findOne({ _id: jobId, createdBy: userId });
+  if (!job) {
+    throw new NotFoundError(`No job with id ${jobId}`);
+  }
+  res.status(StatusCodes.OK).json({ job });
 };
 
 const createJob = async (req, res) => {
-    res.status(200).json(req.user);
+  req.body.createdBy = req.user.userId;
+  const job = await Job.create(req.body);
+  res.status(StatusCodes.CREATED).json(job);
 };
 
 const updateJob = async (req, res) => {
-    res.status(200).json({ msg: "Job updated" });
+  const {
+    user: { userId },
+    params: { id: jobId },
+    body: { company, position },
+  } = req;
+
+  console.log(company, position);
+  if (!company || !position) {
+    throw new BadRequestError("Company or Position fields cannot be empty");
+  }
+
+  const job = await Job.findOneAndUpdate(
+    { _id: jobId, createdBy: userId },
+    req.body,
+    { new: true, runValidators: true }
+  );
+
+  if (!job) {
+    throw new NotFoundError(`No job with id ${jobId}`);
+  }
+  res.status(StatusCodes.OK).json({ job });
 };
 
 const deleteJob = async (req, res) => {
-    res.status(200).json({ msg: "Job deleted" });
+  const {
+    user: { userId },
+    params: { id: jobId },
+  } = req;
+
+  const job = await Job.findByIdAndRemove({
+    _id: jobId,
+    createdBy: userId,
+  });
+  if (!job) {
+    throw new NotFoundError(`No job with id ${jobId}`);
+  }
+  res.status(StatusCodes.OK).send();
 };
 
 module.exports = { getAllJobs, getJob, createJob, updateJob, deleteJob };
