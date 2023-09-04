@@ -16,6 +16,7 @@ const connectDB = require("./db/connect");
 const authRouter = require("./routes/authRoutes");
 const cleanRouter = require("./routes/cleanDBRoutes");
 const userRouter = require("./routes/userRoutes");
+const productRouter = require("./routes/productRoutes");
 
 //middleware
 const notFoundMiddleware = require("./middleware/not-found");
@@ -26,32 +27,33 @@ app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 
 app.get("/", (req, res) => {
-    res.send(`Welcome to e-commerce api`);
+  res.send(`Welcome to e-commerce api`);
 });
 
 app.get("/api/v1", (req, res) => {
-    // console.log(req.cookies);
-    console.log(req.signedCookies);
-    res.send(`Welcome to e-commerce api`);
+  // console.log(req.cookies);
+  console.log(req.signedCookies);
+  res.send(`Welcome to e-commerce api`);
 });
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/clean", cleanRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/products", productRouter);
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 3000;
 
 const start = async () => {
-    try {
-        await connectDB(process.env.MONGO_URL);
-        app.listen(port, () => {
-            console.log(`Server is listening on port ${port}...`);
-        });
-    } catch (err) {
-        console.log(err);
-    }
+  try {
+    await connectDB(process.env.MONGO_URL);
+    app.listen(port, () => {
+      console.log(`Server is listening on port ${port}...`);
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 start();
