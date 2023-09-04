@@ -1,25 +1,25 @@
 const express = require("express");
 const router = express.Router();
 const {
-    authenticateUser,
-    authrizePermissions,
+  authenticateUser,
+  authrizePermissions,
 } = require("../middleware/authentication");
 
 const {
-    getAllUsers,
-    getSingleUser,
-    showCurrentUser,
-    updateUserPassword,
-    updateUser,
+  getAllUsers,
+  getSingleUser,
+  showCurrentUser,
+  updateUserPassword,
+  updateUser,
 } = require("../controllers/userController");
 
 router
-    .route("/")
-    .get(authenticateUser, authrizePermissions("admin"), getAllUsers);
+  .route("/")
+  .get(authenticateUser, authrizePermissions("admin"), getAllUsers);
 
 router.route("/showMe").get(authenticateUser, showCurrentUser);
 
-router.route("/updateUser").patch(updateUser);
+router.route("/updateUser").patch(authenticateUser, updateUser);
 
 router.route("/updateUserPassword").patch(authenticateUser, updateUserPassword);
 
